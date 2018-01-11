@@ -1,8 +1,13 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import os
+import glob
+import csv
+from xlsxwriter.workbook import Workbook
 import smtplib
 import time
+import datetime
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
@@ -28,8 +33,8 @@ def  Formato(ws,ultima_fila):
     SaldoFinalAcumulado = 'B' + str(FilaSaldoFinalAcumulado)
     SaldoFinalAcumuladoCell = ws[SaldoFinalAcumulado]
     #Aplicamos estilos
-    RangoTotal = 'Currency'
-    for x in (3,14):
+    #RangoTotal = 'Currency'
+    for x in range(3,15):
         Letra = LetrasExcel(x)
         CoordDate = Letra+str(FilaDate)
         CeldaDate=[CoordDate]
@@ -53,11 +58,95 @@ def  Formato(ws,ultima_fila):
     DateCell.font=FontDate
     DateCell.fill = BlueBackground
 
+def CalculoFecha(ws,ultima_fila):
+    Ultima_fecha = ws.cell(row=ultima_fila-5,column=2).value
+    print(type(Ultima_fecha))
+    semana = datetime.timedelta(days=7)
+    Fecha_Final = Ultima_fecha+semana
+    print(Fecha_Final)
+    FilaDate = ultima_fila+2
+    Date = 'B' + str(FilaDate)
+    DateCell=ws[Date]
+    ws[Date]=Fecha_Final
+    FilaRetencion = ultima_fila+3
+    Retencion = 'B' + str(FilaRetencion)
+    ws[Retencion]='Retencion'
+    FilaFaltante = ultima_fila+4
+    Faltante = 'B' + str(FilaFaltante)
+    ws[Faltante]='Faltante por pagar'
+    FilaComplemento = ultima_fila+5
+    Complemento = 'B' + str(FilaComplemento)
+    ws[Complemento]='Complemento pagado'
+    FilaTotal = ultima_fila+6
+    Total = 'B' + str(FilaTotal)
+    ws[Total]='Total Pagado'
+    FilaSaldoFinal = ultima_fila+7
+    SaldoFinal = 'B' + str(FilaSaldoFinal)
+    ws[SaldoFinal]='SaldoFinalAcumulado'
+    return(Fecha_Final)
+
+def BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final):
+    for x in range(3,15):
+        IdentificadorExcel = ws.cell(row=3,column=x).value
+        if(IdentificadorExcel == id_unico):
+            Producto = ws.cell(row=7,column=x).value
+            print('Llegue')
+            print(type(str(Producto)))
+            if(str(Producto)=='S'):
+                Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
+                print('SiEntre')
+            else:
+                if(str(Producto)=='V'):
+                    Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
+                else:
+                    if(str(Producto)=='SE'):
+                        SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
+                    else:
+                        if(str(Producto)=='ME'):
+                            MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
+
+
+def Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
+    LetraCliente=LetrasExcel(columna)
+    PagoCoord = LetraCliente+str(ultima_fila+3)
+    print(PagoCoord)
+    ws[PagoCoord]=float(Pago_cargado)
+
+
+def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
+    LetraCliente=LetrasExcel(columna)
+    PagoCoord = LetraCliente+str(ultima_fila+3)
+    print(PagoCoord)
+    ws[PagoCoord]=float(Pago_cargado)
+
+
+def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
+    LetraCliente=LetrasExcel(columna)
+    PagoCoord = LetraCliente+str(ultima_fila+3)
+    print(PagoCoord)
+    ws[PagoCoord]=float(Pago_cargado)
+
+def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
+    LetraCliente=LetrasExcel(columna)
+    PagoCoord = LetraCliente+str(ultima_fila+3)
+    print(PagoCoord)
+    ws[PagoCoord]=float(Pago_cargado)
 
 
 wb=load_workbook('180105 Pagos Uber.xlsx')
 ws = wb.active
 ultima_fila = ws.max_row
-
+execfile('csvtoexcel.py')
 Formato(ws,ultima_fila)
+Fecha_Final=CalculoFecha(ws,ultima_fila)
+wb2=load_workbook('uber_to_arkafin.xlsx')
+UberToArkafin=wb2.active
+Ultima_Fila_Arkafin=UberToArkafin.max_row
+for x in range(2,Ultima_Fila_Arkafin+1):
+    id_unico = UberToArkafin.cell(row=x,column=2).value
+    Pago_cargado = UberToArkafin.cell(row=x,column=4).value
+    BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final)
+
+
+
 wb.save('Prubes.xlsx')
