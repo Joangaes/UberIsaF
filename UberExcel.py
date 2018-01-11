@@ -104,6 +104,9 @@ def BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final):
                     else:
                         if(str(Producto)=='ME'):
                             MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
+                        else:
+                            if(str(Producto)=='JM'):
+                                JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,x)
 
 
 def Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
@@ -135,6 +138,7 @@ def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         PagoCoord = LetraCliente+str(ultima_fila+3)
         print(PagoCoord)
         ws[PagoCoord]=float(Pago_cargado)
+        
         Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
         CoordDeuda = LetraCliente+str(ultima_fila+2)
         DeudaFinal = float(Deuda)+1860
@@ -188,6 +192,38 @@ def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         CoordFaltante = LetraCliente+str(ultima_fila+4)
         ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
 
+
+def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
+    FechaInicio = ws.cell(row=6,column=columna).value
+    FechaActual = ws.cell(row=ultima_fila+2,column=2).value
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    print('Fechas hasta hoy:'+str(Diferencia_Fechas))
+    if(Diferencia_Fechas<16):
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        DeudaFinal = float(Deuda)+3640.36
+        ws[CoordDeuda] = DeudaFinal
+        #Desde aqui -- Lo que falta por pagar
+        CoordFaltante = LetraCliente+str(ultima_fila+4)
+        ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+    else:
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        DeudaFinal = float(Deuda)+3640.36
+        ws[CoordDeuda] = DeudaFinal
+        #Desde aqui -- Lo que falta por pagar
+        CoordFaltante = LetraCliente+str(ultima_fila+4)
+        ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+        CoordProducto=LetraCliente+'7'
+        ws[CoordProducto]= 'S'
 
 wb=load_workbook('180105 Pagos Uber.xlsx', data_only=True)
 ws = wb.active
