@@ -125,6 +125,10 @@ def Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         #Desde aqui -- Lo que falta por pagar
         CoordFaltante = LetraCliente+str(ultima_fila+4)
         ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+        #Formulas, faltante
+        ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
+        #Saldo Final Acumulado
+        ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
 
 
 
@@ -138,7 +142,7 @@ def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         PagoCoord = LetraCliente+str(ultima_fila+3)
         print(PagoCoord)
         ws[PagoCoord]=float(Pago_cargado)
-        
+        ws[PagoCoord].number_format
         Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
         CoordDeuda = LetraCliente+str(ultima_fila+2)
         DeudaFinal = float(Deuda)+1860
@@ -146,6 +150,10 @@ def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         #Desde aqui -- Lo que falta por pagar
         CoordFaltante = LetraCliente+str(ultima_fila+4)
         ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+        #Formulas, faltante
+        ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
+        #Saldo Final Acumulado
+        ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
 
 
 def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
@@ -170,6 +178,10 @@ def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
             #Desde aqui -- Lo que falta por pagar
             CoordFaltante = LetraCliente+str(ultima_fila+4)
             ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+        #Formulas, faltante
+        ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
+        #Saldo Final Acumulado
+        ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
 
 def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
     FechaInicio = ws.cell(row=6,column=columna).value
@@ -191,6 +203,10 @@ def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         #Desde aqui -- Lo que falta por pagar
         CoordFaltante = LetraCliente+str(ultima_fila+4)
         ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+        #Formulas, faltante
+        ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
+        #Saldo Final Acumulado
+        ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
 
 
 def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
@@ -224,6 +240,10 @@ def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
         CoordProducto=LetraCliente+'7'
         ws[CoordProducto]= 'S'
+    #Formulas, faltante
+    ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
+    #Saldo Final Acumulado
+    ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
 
 wb=load_workbook('180105 Pagos Uber.xlsx', data_only=True)
 ws = wb.active
@@ -238,7 +258,6 @@ for x in range(2,Ultima_Fila_Arkafin+1):
     id_unico = UberToArkafin.cell(row=x,column=2).value
     Pago_cargado = UberToArkafin.cell(row=x,column=4).value
     BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final)
-
 
 
 wb.save('Prubes.xlsx')
