@@ -107,39 +107,95 @@ def BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final):
 
 
 def Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
-    LetraCliente=LetrasExcel(columna)
-    PagoCoord = LetraCliente+str(ultima_fila+3)
-    print(PagoCoord)
-    ws[PagoCoord]=float(Pago_cargado)
+    FechaInicio = ws.cell(row=6,column=int(columna)).value
+    FechaActual = ws.cell(row=ultima_fila+2,column=2).value
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    if(Diferencia_Fechas<209):
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        DeudaFinal = float(Deuda)+2730.27
+        ws[CoordDeuda] = DeudaFinal
+        #Desde aqui -- Lo que falta por pagar
+        CoordFaltante = LetraCliente+str(ultima_fila+4)
+        ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
+
+
 
 
 def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
-    LetraCliente=LetrasExcel(columna)
-    PagoCoord = LetraCliente+str(ultima_fila+3)
-    print(PagoCoord)
-    ws[PagoCoord]=float(Pago_cargado)
+    FechaInicio = ws.cell(row=6,column=int(columna)).value
+    FechaActual = ws.cell(row=ultima_fila+2,column=2).value
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    if(Diferencia_Fechas<209):
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        DeudaFinal = float(Deuda)+1860
+        ws[CoordDeuda] = DeudaFinal
+        #Desde aqui -- Lo que falta por pagar
+        CoordFaltante = LetraCliente+str(ultima_fila+4)
+        ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
 
 
 def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
-    LetraCliente=LetrasExcel(columna)
-    PagoCoord = LetraCliente+str(ultima_fila+3)
-    print(PagoCoord)
-    ws[PagoCoord]=float(Pago_cargado)
+    FechaInicio = ws.cell(row=6,column=int(columna)).value
+    FechaActual = ws.cell(row=ultima_fila+2,column=2).value
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    if(Diferencia_Fechas<217):
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        print(Deuda)
+        if(Deuda!='#VALUE!'):
+            if(Diferencia_Fechas<25):
+                DeudaFinal = float(Deuda)+2500
+                ws[CoordDeuda] = DeudaFinal
+            else:
+                DeudaFinal= float(Deuda+2000)
+                ws[CoordDeuda] = DeudaFinal
+            #Desde aqui -- Lo que falta por pagar
+            CoordFaltante = LetraCliente+str(ultima_fila+4)
+            ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
 
 def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
-    LetraCliente=LetrasExcel(columna)
-    PagoCoord = LetraCliente+str(ultima_fila+3)
-    print(PagoCoord)
-    ws[PagoCoord]=float(Pago_cargado)
+    FechaInicio = ws.cell(row=6,column=columna).value
+    FechaActual = ws.cell(row=ultima_fila+2,column=2).value
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    if(Diferencia_Fechas<209):
+        LetraCliente=LetrasExcel(int(columna))
+        PagoCoord = LetraCliente+str(ultima_fila+3)
+        print(PagoCoord)
+        ws[PagoCoord]=float(Pago_cargado)
+        Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
+        CoordDeuda = LetraCliente+str(ultima_fila+2)
+        if(Diferencia_Fechas<25):
+            DeudaFinal = float(Deuda)+2500
+            ws[CoordDeuda] = DeudaFinal
+        else:
+            DeudaFinal= float(Deuda+2000)
+            ws[CoordDeuda] = DeudaFinal
+        #Desde aqui -- Lo que falta por pagar
+        CoordFaltante = LetraCliente+str(ultima_fila+4)
+        ws[CoordFaltante] = DeudaFinal - float(ws.cell(row=ultima_fila+3,column=columna).value)
 
 
-wb=load_workbook('180105 Pagos Uber.xlsx')
+wb=load_workbook('180105 Pagos Uber.xlsx', data_only=True)
 ws = wb.active
 ultima_fila = ws.max_row
 execfile('csvtoexcel.py')
 Formato(ws,ultima_fila)
 Fecha_Final=CalculoFecha(ws,ultima_fila)
-wb2=load_workbook('uber_to_arkafin.xlsx')
+wb2=load_workbook('uber_to_arkafin.xlsx', data_only=True)
 UberToArkafin=wb2.active
 Ultima_Fila_Arkafin=UberToArkafin.max_row
 for x in range(2,Ultima_Fila_Arkafin+1):
