@@ -83,6 +83,7 @@ def CalculoFecha(ws,ultima_fila):
     FilaSaldoFinal = ultima_fila+7
     SaldoFinal = 'B' + str(FilaSaldoFinal)
     ws[SaldoFinal]='SaldoFinalAcumulado'
+    ws[Date].number_format = 'd-mmm'
     return(Fecha_Final)
 
 def BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final):
@@ -129,6 +130,13 @@ def Sedan(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
         #Saldo Final Acumulado
         ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
+        #Formato Numero
+        ws[PagoCoord].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordDeuda].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordFaltante].number_format='"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+5)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
 
 
 
@@ -141,8 +149,9 @@ def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         LetraCliente=LetrasExcel(int(columna))
         PagoCoord = LetraCliente+str(ultima_fila+3)
         print(PagoCoord)
+
         ws[PagoCoord]=float(Pago_cargado)
-        ws[PagoCoord].number_format
+
         Deuda = ws.cell(row=ultima_fila,column=int(columna)).value
         CoordDeuda = LetraCliente+str(ultima_fila+2)
         DeudaFinal = float(Deuda)+1860
@@ -154,6 +163,14 @@ def Versa(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
         #Saldo Final Acumulado
         ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
+        #Formato Numero
+        ws[PagoCoord].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordDeuda].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordFaltante].number_format='"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+5)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
+
 
 
 def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
@@ -182,6 +199,13 @@ def SinEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
         #Saldo Final Acumulado
         ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
+        #Formato Numero
+        ws[PagoCoord].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordDeuda].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordFaltante].number_format='"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+5)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
 
 def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
     FechaInicio = ws.cell(row=6,column=columna).value
@@ -207,6 +231,13 @@ def MedioEnganche(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
         ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
         #Saldo Final Acumulado
         ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
+        #Formato Numero
+        ws[PagoCoord].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordDeuda].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[CoordFaltante].number_format='"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+5)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+        ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
 
 
 def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
@@ -244,6 +275,13 @@ def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
     ws[LetraCliente+str(ultima_fila+6)] = "="+PagoCoord+"+"+LetraCliente+str(ultima_fila+5)
     #Saldo Final Acumulado
     ws[LetraCliente+str(ultima_fila+7)] = "="+CoordDeuda+"-"+LetraCliente+str(ultima_fila+6)
+    #Formato Numero
+    ws[PagoCoord].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+    ws[CoordDeuda].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+    ws[CoordFaltante].number_format='"$"#,##0.00_);("$"#,##0.00)'
+    ws[LetraCliente+str(ultima_fila+5)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+    ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
+    ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
 
 wb=load_workbook('180105 Pagos Uber.xlsx', data_only=True)
 ws = wb.active
