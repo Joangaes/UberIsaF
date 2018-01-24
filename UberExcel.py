@@ -2,6 +2,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import os
+from os import listdir
+from os.path import isfile, join
 import glob
 import csv
 from xlsxwriter.workbook import Workbook
@@ -34,7 +36,8 @@ def  Formato(ws,ultima_fila):
     SaldoFinalAcumuladoCell = ws[SaldoFinalAcumulado]
     #Aplicamos estilos
     #RangoTotal = 'Currency'
-    for x in range(3,15):
+    LimiteColumnas = ws.max_column
+    for x in range(3,LimiteColumnas):
         Letra = LetrasExcel(x)
         CoordDate = Letra+str(FilaDate)
         CeldaDate=[CoordDate]
@@ -283,13 +286,25 @@ def JorgeMaldonado(Pago_cargado,ws,ultima_fila,Fecha_Final,columna):
     ws[LetraCliente+str(ultima_fila+6)].number_format = '"$"#,##0.00_);("$"#,##0.00)'
     ws[LetraCliente+str(ultima_fila+7)].number_format = '[Red]"$"#,##0.00_);[Color 10]"-$"#,##0.00'
 
-wb=load_workbook('180105 Pagos Uber.xlsx', data_only=True)
+
+
+UberFile = [f for f in listdir('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber') if isfile(join('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber', f))]
+print UberFile
+
+
+
+wb=load_workbook('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber/'+str(UberFile[0]), data_only=True)
 ws = wb.active
 ultima_fila = ws.max_row
+print(ultima_fila)
+
 execfile('csvtoexcel.py')
+
+VisorFile = [f for f in listdir('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber\PagosArkafin') if isfile(join('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber\PagosArkafin', f))]
+
 Formato(ws,ultima_fila)
 Fecha_Final=CalculoFecha(ws,ultima_fila)
-wb2=load_workbook('uber_to_arkafin.xlsx', data_only=True)
+wb2=load_workbook('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber\PagosArkafin/'+VisorFile[0], data_only=True)
 UberToArkafin=wb2.active
 Ultima_Fila_Arkafin=UberToArkafin.max_row
 for x in range(2,Ultima_Fila_Arkafin+1):
@@ -298,4 +313,16 @@ for x in range(2,Ultima_Fila_Arkafin+1):
     BusquedaID(id_unico,Pago_cargado,ws,ultima_fila,Fecha_Final)
 
 
-wb.save('Prubes.xlsx')
+
+mesnombre='%02d' % datetime.date.today().month
+print(mesnombre)
+dianombre='%02d' % datetime.date.today().day
+print(dianombre)
+year = datetime.date.today().year
+print(year)
+yearstr = str(year)
+yearnom = yearstr[2] + yearstr[3]
+print(yearnom)
+wb.save('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber/'+yearnom+mesnombre+dianombre+' Pagos Uber.xlsx')
+os.rename('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber/'+str(UberFile[0]),'C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber/Anteriores/'+str(UberFile[0]))
+os.remove('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber\PagosArkafin/'+VisorFile[0])
