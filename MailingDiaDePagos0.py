@@ -16,6 +16,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
 
+def Pagos_a_Coches(letra):
+    return {'S':2730.27,'V':1860,'ME1':2500,'ME2':2000,'SE1':2500,'SE2':2000}[letra]
+
 def SendNewMail(Usuario,contrasena,mail_destino,cuerpo,html):
     smtpObj = smtplib.SMTP('smtp.gmail.com',587)
     smtpObj.starttls()
@@ -23,49 +26,82 @@ def SendNewMail(Usuario,contrasena,mail_destino,cuerpo,html):
     msg = MIMEMultipart()
     msg.attach(cuerpo)
     msg.attach(html)
-    msg['From']=Usuario
-    msg['Subject']="Deuda plan Uber"
+    msg['From']="Mutuo Financiera"
+    msg['Subject']="Status Uber"
     smtpObj.sendmail(Usuario,mail_destino,str(msg))
     smtpObj.quit()
 
+def FindMail(clave):
+    wb2=load_workbook('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\UberClients.xlsx', data_only=True)
+    ws2=wb2.active
+    LastRow = ws2.max_row
+    Max_column = ws2.max_column
+    for x in range(1,Max_column):
+        if(clave== ws2.cell(row=2,column=x).value):
+            return ws2.cell(row=44,column=x).value
+    return False
+
+
 def definirCorreo(ws,columna,ultima_fila):
+    FechaInicio = ws.cell(row=6,column=int(columna)).value
+    FechaActual = date.today()
+    FechaActual = datetime.combine(FechaActual,datetime.min.time())
+    Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+    Letra = ws.cell(row=7,column=int(columna)).value
+    if(Letra == 'SE' or Letra =='ME'):
+        if(Letra=='SE'):
+            if(Diferencia_Fechas>24):
+                Letra = 'SE2'
+            else:
+                Letra = 'SE1'
+        else:
+            if(Diferencia_Fechas>24):
+                Letra = 'ME2'
+            else:
+                Letra = 'ME1'
+    SaldoAQuitarDeOtroTermino = Pagos_a_Coches(Letra)
     Semanas_a_tiempo=ws.cell(row=8,column=columna).value
-    SaldoFinalAcumulado = ws.cell(row=ultima_fila,column=columna).value
+    try:
+        SaldoFinalAcumulado = float(ws.cell(row=ultima_fila ,column=columna).value)-SaldoAQuitarDeOtroTermino
+    except TypeError:
+        SaldoFinalAcumulado = ws.cell(row=ultima_fila,column=columna).value
     Fecha = date.today()
+    print('Saldo a quitar de otro termino:' + str(SaldoAQuitarDeOtroTermino))
+    print("La ultima fila es: " + str(ultima_fila))
+    print("El saldo final acumulado es:" + str(SaldoFinalAcumulado))
     if(Semanas_a_tiempo>7):#Estrella Plus
         if(SaldoFinalAcumulado>0):
-            html = "Te escribo por parte de Mutuo Financiera. Para recordarte que tu renta no ha sido cubierta. Tienes un saldo de $"+ SaldoFinalAcumulado+" correspondiente al pago de tu veh&iacute;culo. Estamos seguros que se debe a un descuido, te pedimos lo pagues hoy mismo.\nSi ya ha enviado su pago, perm&iacute;tanos agradecerle.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\n Sin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
+            html = "Te escribo por parte de Mutuo Financiera. Para recordarte que tu renta no ha sido cubierta. Tienes un saldo de $"+ str(SaldoFinalAcumulado)+" correspondiente al pago de tu veh&iacute;culo. Estamos seguros que se debe a un descuido, te pedimos lo pagues hoy mismo.\nSi ya ha enviado su pago, perm&iacute;tanos agradecerle.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\n Sin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
         else:
-            html = "Te escribo por parte de Mutuo Financiera. El presente tiene como motivo agradecerte tu compromiso con nosotros y hacerte saber que tu pago fue recibido de manera oportuna y puntual. Nos enorgullece saber que estas comprometido con tu proyecto y que vas al corriente en tu esquema de pagos.\n Si existe algo m$aacute;s en lo que podamos ayudarte no dejes de contactarnos. \n Sin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
+            html = "Te escribo por parte de Mutuo Financiera. El presente tiene como motivo agradecerte tu compromiso con nosotros y hacerte saber que tu pago fue recibido de manera oportuna y puntual. Nos enorgullece saber que estas comprometido con tu proyecto y que vas al corriente en tu esquema de pagos.\n Si existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos. \n Sin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
     else:
         if(Semanas_a_tiempo>3):#Estrella
             if(SaldoFinalAcumulado>0):
-                html = "Te escribo por parte de Mutuo Financiera donde tenemos como objetivo impulsar a M&eacute;xico a trav&eacute;s de la inclusi&oacute;n financiera de MYPYMEs como t&uacute;, por lo tanto, nos emociona estar contigo durante el proceso de adquirir tu veh&iacute;culo propio. Recuerda que si pagas a tiempo el monto de $"+ SaldoFinalAcumulado +" el d&iacute;a [Fecha adeudo], juntos podremos seguir creciendo tu negocio."
+                html= "Te escribo por parte de Mutuo Financiera. Tienes un atraso de $"+str(SaldoFinalAcumulado)+" en tu saldo con respecto a la renta de tu veh&iacute;culo dentro de la plataforma UBER. Solicitamos te pongas al corriente con tus pagos a la brevedad para que los intereses moratorios no sigan incrementando y podamos seguir ayud&aacute;ndote en el proceso de independizarte.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\nSin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
                 ws.cell(row=8,column=columna).value = 0
             else:
                 html = "Te escribo por parte de Mutuo Financiera. El presente tiene como motivo agradecerte tu compromiso con nosotros y hacerte saber que tu pago fue recibido de manera oportuna y puntual. Nos enorgullece saber que estas comprometido con tu proyecto y que vas al corriente en tu esquema de pagos.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\nSin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
         else: #Busqueda Prueba o Normal
-            FechaInicio = ws.cell(row=6,column=int(columna)).value
-            FechaActual = date.today()
-            FechaActual = datetime.combine(FechaActual,datetime.min.time())
-            Diferencia_Fechas= (FechaActual-FechaInicio).days/7
+
             if(Diferencia_Fechas>11): #Ya no esta en periodo de prueba
                 if(SaldoFinalAcumulado>0):#Debe
-                    html= "Te escribo por parte de Mutuo Financiera. Desde [Fecha adeudo], tienes un atraso de XXXX en tu saldo con respecto a la renta de tu veh&iacute;culo dentro de la plataforma UBER. Solicitamos te pongas al corriente con tus pagos a la brevedad para que los intereses moratorios no sigan incrementando y podamos seguir ayud&aacute;ndote en el proceso de independizarte.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\nSin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
+                    html= "Te escribo por parte de Mutuo Financiera. Tienes un atraso de $"+str(SaldoFinalAcumulado)+" en tu saldo con respecto a la renta de tu veh&iacute;culo dentro de la plataforma UBER. Solicitamos te pongas al corriente con tus pagos a la brevedad para que los intereses moratorios no sigan incrementando y podamos seguir ayud&aacute;ndote en el proceso de independizarte.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\nSin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
+                    ws.cell(row=8,column=columna).value = 0
                 else:#No debe
                     html= "Te escribo por parte de Mutuo Financiera. Nos da mucho gusto verte crecer a trav&eacute;s de la adquisici&oacute;n de tu veh&iacute;culo propio,  por lo que nos gustar&iacute;a agradecerte que hemos recibido tu pago de manera puntual. Recuerda que al finalizar todos tus pagos, ser&aacute;s tu propio jefe.\nSi existe algo m&aacute;s en lo que podamos ayudarte no dejes de contactarnos.\nSin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
             else: #Periodo de Prueba
                 if(SaldoFinalAcumulado>0):
                     html = "Te escribo por parte de Mutuo Financiera. Recuerda que los 3 primeros meses de tu contrato son un periodo de prueba para poder confiar en ti. A d&iacute;a de hoy "+ str(Fecha.day) +"/"+ str(Fecha.month)+"/"+ str(Fecha.year)+", est&aacute; pendiente el pago de $"+ str(SaldoFinalAcumulado)+". Te solicitamos liquides tu saldo a la brevedad posible, de lo contrario nos veremos obligados a terminar con el periodo de prueba y nuestra relaci&oacute;n contractual."
+                    ws.cell(row=8,column=columna).value = 0
                 else:
-                    html = "Te escribo por parte de Mutuo Financiera. El presente tiene como motivo agradecerte tu compromiso con nosotros y hacerte saber que tu pago fue recibido de manera oportuna y puntual. Nos enorgullece saber que estas comprometido con tu proyecto y que vas al corriente en tu esquema de pagos.\n Si existe algo m$aacute;s en lo que podamos ayudarte no dejes de contactarnos. \n Sin m&aacute;s por el momento, seguimos a tus &oacute;rdenes."
+                    html = "Te escribo por parte de Mutuo Financiera donde tenemos como objetivo impulsar a México a través de la inclusión financiera de MYPYMEs como tú, por lo tanto, queremos agradecerte que recibimos tu pago de manera oportuna y puntual. Nos emociona estar contigo durante el proceso de adquirir tu vehículo propio.\nSi existe algo más en lo que podamos ayudarte no dejes de contactarnos.\nSin más por el momento, seguimos a tus órdenes."
 
 
 
     return html
 
-def ComponerMail(html):
-    """<!DOCTYPE html>
+def ComponerMail(Nombre,html):
+    htmlfinal="""<!DOCTYPE html>
     <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
         <meta charset="utf-8"> <!-- utf-8 works for most cases -->
@@ -293,7 +329,7 @@ def ComponerMail(html):
                         <td bgcolor="#fafafa">
                             <table role="presentation" cellspacing="0" cellpdding="0" border="0" width="100%">
                                 <tr>
-                                    <img src="http://i347.photobucket.com/albums/p444/Gupie21/grfico_web-02_zpsiymaqryr.png" alt="alt_text" border="0" align="left" style="position: relative; width: 100%; height: auto;">
+                                    <img src="http://i236.photobucket.com/albums/ff303/joangaes/correo1_zps0xnsgcpb.png" alt="alt_text" border="0" align="left" style="position: relative; width: 100%; height: auto;">
                                 </tr>
                                 <tr>
                                     <td style="padding: 0px 40px 50px; text-align: left;">
@@ -316,7 +352,7 @@ def ComponerMail(html):
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto;">
                                             <tr>
                                                 <td style="padding: 0px 0; text-align: center">
-                                                    <img src="http://i347.photobucket.com/albums/p444/Gupie21/correo2_zpsutovvifm.jpg" width="150" height="50" alt="alt_text" border="0" style="height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 140%; color: #555555;">
+                                                    <img src="http://i236.photobucket.com/albums/ff303/joangaes/correo2_zpsebziy1fy.jpg" width="150" height="50" alt="alt_text" border="0" style="height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 140%; color: #555555;">
                                                 </td>
                                             </tr>
                                         </table>
@@ -325,7 +361,7 @@ def ComponerMail(html):
                                 </tr>
                                 <tr>
                                     <td style="padding: 0px 40px 80px; text-align: center;">
-                                        <h1 style="margin: 0; font-family: sans-serif; font-size: 18px; line-height: 125%; color: #01558B; font-weight: bold;">#JuntosPodemosMás</h1>
+                                        <h1 style="margin: 0; font-family: sans-serif; font-size: 18px; line-height: 125%; color: #01558B; font-weight: bold;">#JuntosPodemosM&aacute;s</h1>
                                     </td>
                                 </tr>
                                 <tr>
@@ -352,6 +388,7 @@ def ComponerMail(html):
     </body>
     </html>
 """
+    return htmlfinal
 
 UberFile = [f for f in listdir('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber') if isfile(join('C:\Users\Mutuo Midgard\Box Sync\ISA F\UBER\Pagos Uber', f))]
 print UberFile
@@ -364,16 +401,17 @@ ultima_fila = ws.max_row
 ultima_columna = ws.max_column
 Usuario = 'lserio@mutuofinanciera.com'
 contrasena = 'Fhvy7032'
-print(ultima_columna)
 
 for x in range(3,ultima_columna):
-    if(True):
+    clave = ws.cell(row=3,column=x).value
+    mail = FindMail(clave)
+    if(mail!=False):
         Nombre = ws.cell(row=2,column=x).value
         #Componer html
         html= definirCorreo(ws,x,ultima_fila)
-        cuerpo= ComponerMail(Nombre, html)
-        print(html)
-        print('Numero: '+str(x))
-        print(Nombre)
+        cuerpohtml= ComponerMail(Nombre, html)
         #Extraer mail de destino
-        #SendNewMail(Usuario,contrasena,mail_destino,cuerpo,html)
+        cuerpo=MIMEText(" ",'plain')
+        cuerpofinalhtml = MIMEText(cuerpohtml, 'html')
+        SendNewMail(Usuario,contrasena,mail,cuerpo,cuerpofinalhtml)
+        time.sleep(1)
